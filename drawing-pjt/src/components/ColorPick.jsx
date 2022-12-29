@@ -1,10 +1,10 @@
 import React from "react";
+import { CompactPicker } from "react-color";
 
 function ColorPick(props) {
   return (
     <div>
-      <div></div>
-      <button>colorpick</button>
+      <CompactPicker />
     </div>
   );
 }
