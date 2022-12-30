@@ -4,7 +4,7 @@ import { FigurePickerState } from "../recoil/figureState";
 
 function FigurePick() {
   const [currentFigure, setCurrentFigure] = useRecoilState(FigurePickerState);
-  // straightLine, curvedLine, circle, rect, polygon
+  // straightLine, curvedLine, circle, square, polygon
   // 버튼 클릭시 모양 변경해줌
   const figurePickClick = (e) => {
     setCurrentFigure(e.target.className);
@@ -24,7 +24,7 @@ function FigurePick() {
       <button className="circle" onClick={figurePickClick}>
         원
       </button>
-      <button className="rect" onClick={figurePickClick}>
+      <button className="square" onClick={figurePickClick}>
         직사각형
       </button>
       <button className="polygon" onClick={figurePickClick}>
