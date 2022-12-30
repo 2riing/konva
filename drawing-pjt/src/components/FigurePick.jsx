@@ -1,11 +1,17 @@
 import React from "react";
+import { useRecoilValue } from "recoil";
+import { FigurePickerState } from "../recoil/figureState";
 
-function FigurePick(props) {
+function FigurePick() {
+  const currentFigure = useRecoilValue(FigurePickerState);
+  // straightLine, curvedLine, circle, rect, polygon
   return (
     <div>
-      <div></div>
-      직선, 곡선, 원, 직사각형, 다각형
-      <button>FigurePick</button>
+      <button>직선</button>
+      <button>곡선</button>
+      <button>원</button>
+      <button>직사각형</button>
+      <button>다각형</button>
     </div>
   );
 }
