@@ -1,4 +1,5 @@
 import { useState } from "react";
+import styled from "styled-components";
 import { Stage, Layer, Rect, Text } from "react-konva";
 
 function DrawingSpace(props) {
@@ -54,7 +55,7 @@ function DrawingSpace(props) {
   };
 
   return (
-    <div className="App">
+    <DrawingSpaceContainer>
       <Stage
         width={window.innerWidth}
         height={window.innerHeight}
@@ -78,8 +79,12 @@ function DrawingSpace(props) {
           })}
         </Layer>
       </Stage>
-    </div>
+    </DrawingSpaceContainer>
   );
 }
+
+const DrawingSpaceContainer = styled.div`
+  border: 5px solid black;
+`;
 
 export default DrawingSpace;
