@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { Stage, Layer, Rect, Text } from "react-konva";
 import { useRecoilValue } from "recoil";
 import { FigurePickerState } from "../recoil/figureState";
+import { ColorPickerState } from "../recoil/colorState";
 
 function DrawingSpace() {
   const [squares, setSquares] = useState([]);
@@ -10,6 +11,7 @@ function DrawingSpace() {
   const [straightLine, setStraightLine] = useState([]);
   const [newStraightLine, setNewStraightLine] = useState([]); // 새로 그리는 직선
   const figurePick = useRecoilValue(FigurePickerState);
+  const colorPick = useRecoilValue(ColorPickerState);
   const rectFigures = [...squares, ...newSquares];
 
   const handleMouseDown = (event) => {
@@ -68,7 +70,9 @@ function DrawingSpace() {
   const rectMouseDown = (event) => {
     if (newSquares.length === 0) {
       const { x, y } = event.target.getStage().getPointerPosition();
-      setNewSquares([{ x, y, width: 0, height: 0, key: "0" }]);
+      setNewSquares([
+        { x, y, width: 0, height: 0, key: "0", stroke: `${colorPick}` },
+      ]);
     }
   };
 
@@ -86,6 +90,7 @@ function DrawingSpace() {
         width: x - sx,
         height: y - sy,
         key: squares.length + 1,
+        stroke: `${colorPick}`,
       };
       squares.push(annotationToAdd);
       setNewSquares([]);
@@ -106,6 +111,7 @@ function DrawingSpace() {
           width: x - sx,
           height: y - sy,
           key: "0",
+          stroke: `${colorPick}`,
         },
       ]);
     }
@@ -130,7 +136,7 @@ function DrawingSpace() {
                 width={value.width}
                 height={value.height}
                 fill="transparent"
-                stroke="black"
+                stroke={value.stroke}
               />
             );
           })}
