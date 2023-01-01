@@ -8,12 +8,18 @@ import { ThickPickerState } from "../recoil/thickState";
 import { stepClasses } from "@mui/material";
 
 function DrawingSpace() {
-  const [squares, setSquares] = useState([]);
-  const [newSquares, setNewSquares] = useState([]); // 새로 그리는 사각형
-  const [straightLine, setStraightLine] = useState([]);
-  const [newStraightLine, setNewStraightLine] = useState([]); // 새로 그리는 직선
+  const [squares, setSquares] = useState([]); // 사각형
+  const [newSquares, setNewSquares] = useState([]);
   const [rectFigures, setRectFigures] = useState([]);
-  const [lineFigures, setLineFigures] = useState([]);
+  const [straightLine, setStraightLine] = useState([]); // 직선
+  const [newStraightLine, setNewStraightLine] = useState([]);
+  const [straightLineFigures, setStraightLineFigures] = useState([]);
+  const [curvedLine, setCurvedLine] = useState([]); // 곡선
+  const [newCurvedLine, setNewCurvedLine] = useState([]);
+  const [curvedLineFigures, setCurvedLineFigures] = useState([]);
+  const [circle, setCircle] = useState([]); // 원
+  const [newCircle, setNewCircle] = useState([]);
+  const [circleFigures, setCircleFigures] = useState([]);
   const thickPick = useRecoilValue(ThickPickerState);
   const figurePick = useRecoilValue(FigurePickerState);
   const colorPick = useRecoilValue(ColorPickerState);
@@ -24,12 +30,12 @@ function DrawingSpace() {
     setRectFigures([...squares, ...newSquares]);
   }, [squares, newSquares]);
   useEffect(() => {
-    setLineFigures([...straightLine, ...newStraightLine]);
+    setStraightLineFigures([...straightLine, ...newStraightLine]);
   }, [straightLine, newStraightLine]);
-
   useEffect(() => {
-    console.log(lineFigures);
-  }, [lineFigures]);
+    setCurvedLineFigures([...curvedLine, ...newCurvedLine]);
+  }, [curvedLine, newCurvedLine]);
+
   useEffect(() => {
     console.log(straightLine);
   }, [straightLine]);
@@ -53,7 +59,16 @@ function DrawingSpace() {
       }
     }
     if (figurePick === "curvedLine") {
-      curvedLineMouseDown(event);
+      if (newCurvedLine.length === 0) {
+        setNewCurvedLine([
+          {
+            points: [x, y],
+            key: "0",
+            stroke: `${colorPick}`,
+            strokeWidth: thickPick,
+          },
+        ]);
+      }
     }
     if (figurePick === "circle") {
       circleMouseDown(event);
@@ -84,7 +99,6 @@ function DrawingSpace() {
     if (figurePick === "straightLine") {
       if (newStraightLine.length === 1) {
         const spoints = newStraightLine[0].points;
-        console.log("ddd", spoints);
         const { x, y } = event.target.getStage().getPointerPosition();
         const annotationToAdd = {
           points: [spoints[0], spoints[1], x, y],
@@ -98,7 +112,19 @@ function DrawingSpace() {
       }
     }
     if (figurePick === "curvedLine") {
-      curvedLineMouseUp(event);
+      if (newCurvedLine.length === 1) {
+        const spoints = newCurvedLine[0].points;
+        const { x, y } = event.target.getStage().getPointerPosition();
+        const annotationToAdd = {
+          points: [...spoints, x, y],
+          key: curvedLine.length + 1,
+          stroke: `${colorPick}`,
+          strokeWidth: thickPick,
+        };
+        curvedLine.push(annotationToAdd);
+        setNewCurvedLine([]);
+        setCurvedLine(curvedLine);
+      }
     }
     if (figurePick === "circle") {
       circleMouseUp(event);
@@ -137,7 +163,7 @@ function DrawingSpace() {
         const { x, y } = event.target.getStage().getPointerPosition();
         setNewStraightLine([
           {
-            points: [...spoints, x, y],
+            points: [spoints[0], spoints[1], x, y],
             key: "0",
             stroke: `${colorPick}`,
             strokeWidth: thickPick,
@@ -147,7 +173,18 @@ function DrawingSpace() {
     }
 
     if (figurePick === "curvedLine") {
-      curvedLineMouseMove(event);
+      if (newCurvedLine.length === 1) {
+        const spoints = newCurvedLine[0].points;
+        const { x, y } = event.target.getStage().getPointerPosition();
+        setNewCurvedLine([
+          {
+            points: [...spoints, x, y],
+            key: "0",
+            stroke: `${colorPick}`,
+            strokeWidth: thickPick,
+          },
+        ]);
+      }
     }
     if (figurePick === "circle") {
       circleMouseMove(event);
@@ -200,7 +237,17 @@ function DrawingSpace() {
               />
             );
           })}
-          {lineFigures.map((value) => {
+          {straightLineFigures.map((value) => {
+            return (
+              <Line
+                points={value.points}
+                fill="transparent"
+                stroke={value.stroke}
+                strokeWidth={value.strokeWidth}
+              />
+            );
+          })}
+          {curvedLineFigures.map((value) => {
             return (
               <Line
                 points={value.points}
