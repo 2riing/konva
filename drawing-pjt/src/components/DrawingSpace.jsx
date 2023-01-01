@@ -1,15 +1,17 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styled from "styled-components";
 import { Stage, Layer, Rect, Text } from "react-konva";
 import { useRecoilValue } from "recoil";
 import { FigurePickerState } from "../recoil/figureState";
 import { ColorPickerState } from "../recoil/colorState";
+import { ThickPickerState } from "../recoil/thickState";
 
 function DrawingSpace() {
   const [squares, setSquares] = useState([]);
   const [newSquares, setNewSquares] = useState([]); // 새로 그리는 사각형
   const [straightLine, setStraightLine] = useState([]);
   const [newStraightLine, setNewStraightLine] = useState([]); // 새로 그리는 직선
+  const thickPick = useRecoilValue(ThickPickerState);
   const figurePick = useRecoilValue(FigurePickerState);
   const colorPick = useRecoilValue(ColorPickerState);
   const rectFigures = [...squares, ...newSquares];
@@ -71,7 +73,15 @@ function DrawingSpace() {
     if (newSquares.length === 0) {
       const { x, y } = event.target.getStage().getPointerPosition();
       setNewSquares([
-        { x, y, width: 0, height: 0, key: "0", stroke: `${colorPick}` },
+        {
+          x,
+          y,
+          width: 0,
+          height: 0,
+          key: "0",
+          stroke: `${colorPick}`,
+          strokeWidth: 5,
+        },
       ]);
     }
   };
@@ -91,6 +101,7 @@ function DrawingSpace() {
         height: y - sy,
         key: squares.length + 1,
         stroke: `${colorPick}`,
+        strokeWidth: thickPick,
       };
       squares.push(annotationToAdd);
       setNewSquares([]);
@@ -112,6 +123,7 @@ function DrawingSpace() {
           height: y - sy,
           key: "0",
           stroke: `${colorPick}`,
+          strokeWidth: thickPick,
         },
       ]);
     }
@@ -137,6 +149,7 @@ function DrawingSpace() {
                 height={value.height}
                 fill="transparent"
                 stroke={value.stroke}
+                strokeWidth={value.strokeWidth}
               />
             );
           })}
