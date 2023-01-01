@@ -36,13 +36,6 @@ function DrawingSpace() {
     setCurvedLineFigures([...curvedLine, ...newCurvedLine]);
   }, [curvedLine, newCurvedLine]);
 
-  useEffect(() => {
-    console.log(straightLine);
-  }, [straightLine]);
-  useEffect(() => {
-    console.log(newStraightLine);
-  }, [newStraightLine]);
-
   // 왼쪽 클릭 시작 : 마우스 좌표 받아와서 새로운 사각형 만들기
   const handleMouseDown = (event) => {
     const { x, y } = event.target.getStage().getPointerPosition();
@@ -216,14 +209,13 @@ function DrawingSpace() {
   return (
     <DrawingSpaceContainer>
       <Stage
-        width={window.innerWidth}
-        height={window.innerHeight}
+        width={1000}
+        height={600}
         onMouseDown={handleMouseDown}
         onMousemove={handleMouseMove}
         onMouseup={handleMouseUp}
       >
         <Layer>
-          <Text text="mytext test" />
           {rectFigures.map((value) => {
             return (
               <Rect
