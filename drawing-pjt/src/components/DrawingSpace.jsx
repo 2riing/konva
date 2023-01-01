@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import styled from "styled-components";
-import { Stage, Layer, Rect, Text } from "react-konva";
+import { Stage, Layer, Rect, Text, Line } from "react-konva";
 import { useRecoilValue } from "recoil";
 import { FigurePickerState } from "../recoil/figureState";
 import { ColorPickerState } from "../recoil/colorState";
@@ -13,6 +13,7 @@ function DrawingSpace() {
   const [straightLine, setStraightLine] = useState([]);
   const [newStraightLine, setNewStraightLine] = useState([]); // 새로 그리는 직선
   const [rectFigures, setRectFigures] = useState([]);
+  const [lineFigures, setLineFigures] = useState([]);
   const thickPick = useRecoilValue(ThickPickerState);
   const figurePick = useRecoilValue(FigurePickerState);
   const colorPick = useRecoilValue(ColorPickerState);
@@ -22,12 +23,34 @@ function DrawingSpace() {
   useEffect(() => {
     setRectFigures([...squares, ...newSquares]);
   }, [squares, newSquares]);
+  useEffect(() => {
+    setLineFigures([...straightLine, ...newStraightLine]);
+  }, [straightLine, newStraightLine]);
+
+  useEffect(() => {
+    console.log(lineFigures);
+  }, [lineFigures]);
+  useEffect(() => {
+    console.log(straightLine);
+  }, [straightLine]);
+  useEffect(() => {
+    console.log(newStraightLine);
+  }, [newStraightLine]);
 
   // 왼쪽 클릭 시작 : 마우스 좌표 받아와서 새로운 사각형 만들기
   const handleMouseDown = (event) => {
     const { x, y } = event.target.getStage().getPointerPosition();
     if (figurePick === "straightLine") {
-      straightLineMouseDown(event);
+      if (newStraightLine.length === 0) {
+        setNewStraightLine([
+          {
+            points: [x, y],
+            key: "0",
+            stroke: `${colorPick}`,
+            strokeWidth: thickPick,
+          },
+        ]);
+      }
     }
     if (figurePick === "curvedLine") {
       curvedLineMouseDown(event);
@@ -57,8 +80,22 @@ function DrawingSpace() {
 
   // 왼쪽 클릭 끝, 도형 그리기 완료
   const handleMouseUp = (event) => {
+    //  직선
     if (figurePick === "straightLine") {
-      straightLineMouseUp(event);
+      if (newStraightLine.length === 1) {
+        const spoints = newStraightLine[0].points;
+        console.log("ddd", spoints);
+        const { x, y } = event.target.getStage().getPointerPosition();
+        const annotationToAdd = {
+          points: [spoints[0], spoints[1], x, y],
+          key: straightLine.length + 1,
+          stroke: `${colorPick}`,
+          strokeWidth: thickPick,
+        };
+        straightLine.push(annotationToAdd);
+        setNewStraightLine([]);
+        setStraightLine(straightLine);
+      }
     }
     if (figurePick === "curvedLine") {
       curvedLineMouseUp(event);
@@ -95,8 +132,20 @@ function DrawingSpace() {
   // Rect, 요소 안에서 움직이는 이벤트, 그리고 있는 중
   const handleMouseMove = (event) => {
     if (figurePick === "straightLine") {
-      straightLineMouseMove(event);
+      if (newStraightLine.length === 1) {
+        const spoints = newStraightLine[0].points;
+        const { x, y } = event.target.getStage().getPointerPosition();
+        setNewStraightLine([
+          {
+            points: [...spoints, x, y],
+            key: "0",
+            stroke: `${colorPick}`,
+            strokeWidth: thickPick,
+          },
+        ]);
+      }
     }
+
     if (figurePick === "curvedLine") {
       curvedLineMouseMove(event);
     }
@@ -145,6 +194,16 @@ function DrawingSpace() {
                 y={value.y}
                 width={value.width}
                 height={value.height}
+                fill="transparent"
+                stroke={value.stroke}
+                strokeWidth={value.strokeWidth}
+              />
+            );
+          })}
+          {lineFigures.map((value) => {
+            return (
+              <Line
+                points={value.points}
                 fill="transparent"
                 stroke={value.stroke}
                 strokeWidth={value.strokeWidth}
