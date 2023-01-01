@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import styled from "styled-components";
-import { Stage, Layer, Rect, Text, Line } from "react-konva";
+import { Stage, Layer, Rect, Text, Line, Circle } from "react-konva";
 import { useRecoilValue } from "recoil";
 import { FigurePickerState } from "../recoil/figureState";
 import { ColorPickerState } from "../recoil/colorState";
@@ -35,6 +35,18 @@ function DrawingSpace() {
   useEffect(() => {
     setCurvedLineFigures([...curvedLine, ...newCurvedLine]);
   }, [curvedLine, newCurvedLine]);
+  useEffect(() => {
+    setCircleFigures([...circle, ...newCircle]);
+  }, [circle, newCircle]);
+
+  // 원의 반지름을 구해주는 함수
+  const getRadius = (sx, sy, x, y) => {
+    const dx = Math.abs(sx - x);
+    const dy = Math.abs(sy - y);
+    console.log(dx, dy);
+    console.log(Math.sqrt(dx * dx + dy * dy));
+    return Math.sqrt(dx * dx + dy * dy);
+  };
 
   // 왼쪽 클릭 시작 : 마우스 좌표 받아와서 새로운 사각형 만들기
   const handleMouseDown = (event) => {
@@ -64,14 +76,25 @@ function DrawingSpace() {
       }
     }
     if (figurePick === "circle") {
-      circleMouseDown(event);
+      if (newCircle.length === 0) {
+        setNewCircle([
+          {
+            x: x,
+            y: y,
+            radius: 0,
+            key: "0",
+            stroke: `${colorPick}`,
+            strokeWidth: thickPick,
+          },
+        ]);
+      }
     }
     if (figurePick === "square") {
       if (newSquares.length === 0) {
         setNewSquares([
           {
-            x,
-            y,
+            x: x,
+            y: y,
             width: thickPick,
             height: thickPick,
             key: "0",
@@ -120,7 +143,24 @@ function DrawingSpace() {
       }
     }
     if (figurePick === "circle") {
-      circleMouseUp(event);
+      if (newCircle.length === 1) {
+        // 기존에 마우스 클릭을 시작했던 좌표
+        const sx = newCircle[0].x;
+        const sy = newCircle[0].y;
+        // 새로 받아온 좌표
+        const { x, y } = event.target.getStage().getPointerPosition();
+        const annotationToAdd = {
+          x: sx,
+          y: sy,
+          radius: getRadius(sx, sy, x, y),
+          key: squares.length + 1,
+          stroke: `${colorPick}`,
+          strokeWidth: thickPick,
+        };
+        circle.push(annotationToAdd);
+        setNewCircle([]);
+        setCircle(circle);
+      }
     }
     if (figurePick === "square") {
       if (newSquares.length === 1) {
@@ -180,7 +220,22 @@ function DrawingSpace() {
       }
     }
     if (figurePick === "circle") {
-      circleMouseMove(event);
+      if (newCircle.length === 1) {
+        // 그리고 있는 사각형이 있다면
+        const sx = newCircle[0].x; // 초기 시작했떤 값을 가져옴
+        const sy = newCircle[0].y;
+        const { x, y } = event.target.getStage().getPointerPosition();
+        setNewCircle([
+          {
+            x: sx,
+            y: sy,
+            radius: getRadius(sx, sy, x, y),
+            key: "0",
+            stroke: `${colorPick}`,
+            strokeWidth: thickPick,
+          },
+        ]);
+      }
     }
     if (figurePick === "square") {
       if (newSquares.length === 1) {
@@ -243,6 +298,18 @@ function DrawingSpace() {
             return (
               <Line
                 points={value.points}
+                fill="transparent"
+                stroke={value.stroke}
+                strokeWidth={value.strokeWidth}
+              />
+            );
+          })}
+          {circleFigures.map((value) => {
+            return (
+              <Circle
+                x={value.x}
+                y={value.y}
+                radius={value.radius}
                 fill="transparent"
                 stroke={value.stroke}
                 strokeWidth={value.strokeWidth}
