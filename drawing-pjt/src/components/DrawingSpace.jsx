@@ -20,10 +20,24 @@ function DrawingSpace() {
   const [circle, setCircle] = useState([]); // 원
   const [newCircle, setNewCircle] = useState([]);
   const [circleFigures, setCircleFigures] = useState([]);
+
+  const [polygon, setPolygon] = useState([]); // 다각형
+  const [newPolygon, setNewPolygon] = useState([]);
+  const [polygonFigures, setPolygonFigures] = useState([]);
+
+  const [points, setPoints] = useState([]);
+  const [curMousePos, setCurMousePos] = useState([0, 0]);
+  const [isMouseOverStartPoint, setIsMouseOverStartPoint] = useState(false);
+  const [isFinished, setIsFinished] = useState(false);
+
   const thickPick = useRecoilValue(ThickPickerState);
   const figurePick = useRecoilValue(FigurePickerState);
   const colorPick = useRecoilValue(ColorPickerState);
   const drwanFigures = [];
+
+  const flattenedPoints = points
+    .concat(isFinished ? [] : curMousePos)
+    .reduce((a, b) => a.concat(b), []);
 
   // 새로 그려질 때마다 저장
   useEffect(() => {
@@ -103,7 +117,7 @@ function DrawingSpace() {
       }
     }
     if (figurePick === "polygon") {
-      polygonMouseDown(event);
+      handleClick(event);
     }
   };
 
@@ -180,7 +194,8 @@ function DrawingSpace() {
       }
     }
     if (figurePick === "polygon") {
-      polygonMouseUp(event);
+      // polygonMouseUp(event);
+      return;
     }
   };
 
@@ -250,8 +265,36 @@ function DrawingSpace() {
       }
     }
     if (figurePick === "polygon") {
-      polygonMouseMove(event);
+      const { x, y } = event.target.getStage().getPointerPosition();
+      setCurMousePos([x, y]);
     }
+  };
+  const handleClick = (event) => {
+    if (figurePick === "polygon") {
+      const { x, y } = event.target.getStage().getPointerPosition();
+      if (isFinished) {
+        return;
+      }
+      if (isMouseOverStartPoint && points.length >= 3) {
+        setIsFinished(true);
+      } else {
+        setPoints([...points, [x, y]]);
+      }
+    }
+  };
+  const handleMouseOverStartPoint = (event) => {
+    if (isFinished || points.length < 3) return;
+    event.target.scale({ x: 2, y: 2 });
+    setIsMouseOverStartPoint(true);
+  };
+  const handleMouseOutStartPoint = (event) => {
+    event.target.scale({ x: 1, y: 1 });
+    setIsMouseOverStartPoint(false);
+  };
+  const handleDragMovePoint = (event) => {
+    const index = event.target.index - 1;
+    const { x, y } = event.target.getStage().getPointerPosition();
+    setPoints([...points.slice(0, index), [x, y], ...points.slice(index + 1)]);
   };
 
   return (
@@ -306,6 +349,41 @@ function DrawingSpace() {
                 fill="transparent"
                 stroke={value.stroke}
                 strokeWidth={value.strokeWidth}
+              />
+            );
+          })}
+
+          <Line
+            stroke="black"
+            points={[50, 50, 200, 50, 200, 200, 50, 200]}
+            bezier
+          />
+          {figurePick === "polygon" ? (
+            <Line
+              points={flattenedPoints}
+              stroke="black"
+              strokeWidth={5}
+              closed={isFinished}
+            />
+          ) : null}
+          {points.map((point, index) => {
+            const width = 6;
+            const x = point[0] - width / 2;
+            const y = point[1] - width / 2;
+            return (
+              <Rect
+                key={index}
+                x={x}
+                y={y}
+                width={width}
+                height={width}
+                fill="white"
+                stroke="black"
+                strokeWidth={3}
+                onDragMove={handleDragMovePoint}
+                onMouseOver={handleMouseOverStartPoint}
+                onMouseOut={handleMouseOutStartPoint}
+                draggable
               />
             );
           })}
