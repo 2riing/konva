@@ -10,10 +10,16 @@ function WhiteCanvas() {
   return (
     <WhiteCanvasContainer>
       <WhiteCanvasTopContainer>
-        <DoBtns />
-        <ColorPick />
-        <ThickPick />
-        <FigurePick />
+        <div className="pickerContainer">
+          <ColorPick />
+          <div className="thickContainer">
+            <div className="thickTxt">두께</div> <ThickPick />
+          </div>
+        </div>
+        <div className="btnContainer">
+          <FigurePick />
+          <DoBtns />
+        </div>
       </WhiteCanvasTopContainer>
       <DrawingSpace />
     </WhiteCanvasContainer>
@@ -29,6 +35,31 @@ const WhiteCanvasContainer = styled.div`
 
 const WhiteCanvasTopContainer = styled.div`
   display: flex;
+  justify-content: center;
+  align-items: center;
+  .pickerContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    width: 300px;
+  }
+  .thickContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 5px;
+  }
+  .thickTxt {
+    margin-right: 15px;
+  }
+  .btnContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    width: 400px;
+  }
 `;
 
 export default WhiteCanvas;
