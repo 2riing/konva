@@ -20,14 +20,10 @@ function DrawingSpace() {
   const [circle, setCircle] = useState([]); // 원
   const [newCircle, setNewCircle] = useState([]);
   const [circleFigures, setCircleFigures] = useState([]);
-
   const [polygon, setPolygon] = useState([]); // 다각형
   const [newPolygon, setNewPolygon] = useState([]);
   const [polygonFigures, setPolygonFigures] = useState([]);
-
-  const [points, setPoints] = useState([]);
-  const [curMousePos, setCurMousePos] = useState([0, 0]);
-  const [isMouseOverStartPoint, setIsMouseOverStartPoint] = useState(false);
+  const [isMouseOverStartPoint, setIsMouseOverStartPoint] = useState(false); // 다각형 시작과 끝
   const [isFinished, setIsFinished] = useState(false);
 
   const thickPick = useRecoilValue(ThickPickerState);
@@ -307,16 +303,11 @@ function DrawingSpace() {
         ]);
       }
     }
-    if (figurePick === "polygon") {
-      const { x, y } = event.target.getStage().getPointerPosition();
-      setCurMousePos([x, y]);
-    }
   };
 
   const handleMouseOverStartPoint = (event) => {
     if (newPolygon.length > 0) {
       if (isFinished || newPolygon[0].points.length < 3) return;
-      // event.target.scale({ x: 2, y: 2 });
       setIsMouseOverStartPoint(true);
     }
   };
