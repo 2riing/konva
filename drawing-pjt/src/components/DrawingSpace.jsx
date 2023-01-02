@@ -35,10 +35,6 @@ function DrawingSpace() {
   const colorPick = useRecoilValue(ColorPickerState);
   const drwanFigures = [];
 
-  const flattenedPoints = points
-    .concat(isFinished ? [] : curMousePos)
-    .reduce((a, b) => a.concat(b), []);
-
   // 새로 그려질 때마다 저장
   useEffect(() => {
     setRectFigures([...squares, ...newSquares]);
@@ -52,6 +48,19 @@ function DrawingSpace() {
   useEffect(() => {
     setCircleFigures([...circle, ...newCircle]);
   }, [circle, newCircle]);
+  useEffect(() => {
+    setPolygonFigures([...polygon, ...newPolygon]);
+  }, [polygon, newPolygon]);
+
+  useEffect(() => {
+    console.log("polygon", polygon);
+  }, [polygon]);
+  useEffect(() => {
+    console.log("newPolygon", newPolygon);
+  }, [newPolygon]);
+  useEffect(() => {
+    console.log("polygonFigures", polygonFigures);
+  }, [polygonFigures]);
 
   // 원의 반지름을 구해주는 함수
   const getRadius = (sx, sy, x, y) => {
@@ -117,7 +126,45 @@ function DrawingSpace() {
       }
     }
     if (figurePick === "polygon") {
-      handleClick(event);
+      console.log(isFinished);
+      if (isFinished) {
+        setIsFinished(false);
+      }
+      // 클릭했는데 시작점이고, 다각형의 요건을 충족한다면
+      if (newPolygon.length === 0) {
+        setNewPolygon([
+          {
+            points: [x, y],
+            key: "0",
+            stroke: `${colorPick}`,
+            strokeWidth: thickPick,
+          },
+        ]);
+      } else {
+        if (isMouseOverStartPoint && newPolygon[0].points.length >= 3) {
+          const spoints = newPolygon[0].points;
+          const annotationToAdd = {
+            points: [...spoints, x, y],
+            key: polygon.length + 1,
+            stroke: `${colorPick}`,
+            strokeWidth: thickPick,
+          };
+          polygon.push(annotationToAdd);
+          setNewPolygon([]);
+          setPolygon(polygon);
+          console.log(polygon, newPolygon, isFinished);
+        } else {
+          const spoints = newPolygon[0].points;
+          setNewPolygon([
+            {
+              points: [...spoints, x, y],
+              key: "0",
+              stroke: `${colorPick}`,
+              strokeWidth: thickPick,
+            },
+          ]);
+        }
+      }
     }
   };
 
@@ -193,10 +240,6 @@ function DrawingSpace() {
         setSquares(squares);
       }
     }
-    if (figurePick === "polygon") {
-      // polygonMouseUp(event);
-      return;
-    }
   };
 
   // Rect, 요소 안에서 움직이는 이벤트, 그리고 있는 중
@@ -269,34 +312,17 @@ function DrawingSpace() {
       setCurMousePos([x, y]);
     }
   };
-  const handleClick = (event) => {
-    if (figurePick === "polygon") {
-      const { x, y } = event.target.getStage().getPointerPosition();
-      if (isFinished) {
-        return;
-      }
-      if (isMouseOverStartPoint && points.length >= 3) {
-        setIsFinished(true);
-      } else {
-        setPoints([...points, [x, y]]);
-      }
+
+  const handleMouseOverStartPoint = (event) => {
+    if (newPolygon.length > 0) {
+      if (isFinished || newPolygon[0].points.length < 3) return;
+      // event.target.scale({ x: 2, y: 2 });
+      setIsMouseOverStartPoint(true);
     }
   };
-  const handleMouseOverStartPoint = (event) => {
-    if (isFinished || points.length < 3) return;
-    event.target.scale({ x: 2, y: 2 });
-    setIsMouseOverStartPoint(true);
-  };
   const handleMouseOutStartPoint = (event) => {
-    event.target.scale({ x: 1, y: 1 });
     setIsMouseOverStartPoint(false);
   };
-  const handleDragMovePoint = (event) => {
-    const index = event.target.index - 1;
-    const { x, y } = event.target.getStage().getPointerPosition();
-    setPoints([...points.slice(0, index), [x, y], ...points.slice(index + 1)]);
-  };
-
   return (
     <DrawingSpaceContainer>
       <Stage
@@ -347,43 +373,25 @@ function DrawingSpace() {
                 y={value.y}
                 radius={value.radius}
                 fill="transparent"
-                stroke={value.stroke}
-                strokeWidth={value.strokeWidth}
               />
             );
           })}
 
-          <Line
+          {/* <Line
             stroke="black"
             points={[50, 50, 200, 50, 200, 200, 50, 200]}
             bezier
-          />
-          {figurePick === "polygon" ? (
-            <Line
-              points={flattenedPoints}
-              stroke="black"
-              strokeWidth={5}
-              closed={isFinished}
-            />
-          ) : null}
-          {points.map((point, index) => {
-            const width = 6;
-            const x = point[0] - width / 2;
-            const y = point[1] - width / 2;
+          /> */}
+
+          {polygonFigures.map((value) => {
             return (
-              <Rect
-                key={index}
-                x={x}
-                y={y}
-                width={width}
-                height={width}
-                fill="white"
-                stroke="black"
-                strokeWidth={3}
-                onDragMove={handleDragMovePoint}
+              <Line
+                points={value.points}
+                fill="transparent"
+                stroke={value.stroke}
+                strokeWidth={value.strokeWidth}
                 onMouseOver={handleMouseOverStartPoint}
                 onMouseOut={handleMouseOutStartPoint}
-                draggable
               />
             );
           })}
