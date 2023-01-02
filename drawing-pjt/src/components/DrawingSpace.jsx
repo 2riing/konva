@@ -31,7 +31,7 @@ function DrawingSpace() {
   const colorPick = useRecoilValue(ColorPickerState);
   const drwanFigures = [];
 
-  // 새로 그려질 때마다 저장
+  // 새로 그려질 때마다 도형들 저장
   useEffect(() => {
     setRectFigures([...squares, ...newSquares]);
   }, [squares, newSquares]);
@@ -47,16 +47,6 @@ function DrawingSpace() {
   useEffect(() => {
     setPolygonFigures([...polygon, ...newPolygon]);
   }, [polygon, newPolygon]);
-
-  useEffect(() => {
-    console.log("polygon", polygon);
-  }, [polygon]);
-  useEffect(() => {
-    console.log("newPolygon", newPolygon);
-  }, [newPolygon]);
-  useEffect(() => {
-    console.log("polygonFigures", polygonFigures);
-  }, [polygonFigures]);
 
   // 원의 반지름을 구해주는 함수
   const getRadius = (sx, sy, x, y) => {
@@ -122,12 +112,9 @@ function DrawingSpace() {
       }
     }
     if (figurePick === "polygon") {
-      console.log(isFinished);
-      if (isFinished) {
-        setIsFinished(false);
-      }
       // 클릭했는데 시작점이고, 다각형의 요건을 충족한다면
       if (newPolygon.length === 0) {
+        setIsFinished(false);
         setNewPolygon([
           {
             points: [x, y],
@@ -364,6 +351,8 @@ function DrawingSpace() {
                 y={value.y}
                 radius={value.radius}
                 fill="transparent"
+                stroke={value.stroke}
+                strokeWidth={value.strokeWidth}
               />
             );
           })}
