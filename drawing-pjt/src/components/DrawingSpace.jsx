@@ -34,19 +34,52 @@ function DrawingSpace() {
   // 새로 그려질 때마다 도형들 저장
   useEffect(() => {
     setRectFigures([...squares, ...newSquares]);
+    if (squares.length > 0) {
+      localStorage.setItem("squares", JSON.stringify(squares));
+    }
   }, [squares, newSquares]);
   useEffect(() => {
     setStraightLineFigures([...straightLine, ...newStraightLine]);
+    if (straightLine.length > 0) {
+      localStorage.setItem("straightLine", JSON.stringify(straightLine));
+    }
   }, [straightLine, newStraightLine]);
   useEffect(() => {
     setCurvedLineFigures([...curvedLine, ...newCurvedLine]);
+    if (curvedLine.length > 0) {
+      localStorage.setItem("curvedLine", JSON.stringify(curvedLine));
+    }
   }, [curvedLine, newCurvedLine]);
   useEffect(() => {
     setCircleFigures([...circle, ...newCircle]);
+    if (circle.length > 0) {
+      localStorage.setItem("circle", JSON.stringify(circle));
+    }
   }, [circle, newCircle]);
   useEffect(() => {
     setPolygonFigures([...polygon, ...newPolygon]);
+    if (polygon.length > 0) {
+      localStorage.setItem("polygon", JSON.stringify(polygon));
+    }
   }, [polygon, newPolygon]);
+
+  useEffect(() => {
+    if (localStorage.getItem("squares")) {
+      setSquares(JSON.parse(localStorage.getItem("squares")));
+    }
+    if (localStorage.getItem("straightLine")) {
+      setStraightLine(JSON.parse(localStorage.getItem("straightLine")));
+    }
+    if (localStorage.getItem("curvedLine")) {
+      setCurvedLine(JSON.parse(localStorage.getItem("curvedLine")));
+    }
+    if (localStorage.getItem("circle")) {
+      setCircle(JSON.parse(localStorage.getItem("circle")));
+    }
+    if (localStorage.getItem("polygon")) {
+      setPolygon(JSON.parse(localStorage.getItem("polygon")));
+    }
+  }, []);
 
   // 원의 반지름을 구해주는 함수
   const getRadius = (sx, sy, x, y) => {
