@@ -43,8 +43,6 @@ function DrawingSpace() {
   const getRadius = (sx, sy, x, y) => {
     const dx = Math.abs(sx - x);
     const dy = Math.abs(sy - y);
-    console.log(dx, dy);
-    console.log(Math.sqrt(dx * dx + dy * dy));
     return Math.sqrt(dx * dx + dy * dy);
   };
 
@@ -144,16 +142,14 @@ function DrawingSpace() {
     }
     if (figurePick === "circle") {
       if (newCircle.length === 1) {
-        // 기존에 마우스 클릭을 시작했던 좌표
         const sx = newCircle[0].x;
         const sy = newCircle[0].y;
-        // 새로 받아온 좌표
         const { x, y } = event.target.getStage().getPointerPosition();
         const annotationToAdd = {
           x: sx,
           y: sy,
           radius: getRadius(sx, sy, x, y),
-          key: squares.length + 1,
+          key: circle.length + 1,
           stroke: `${colorPick}`,
           strokeWidth: thickPick,
         };
@@ -204,7 +200,6 @@ function DrawingSpace() {
         ]);
       }
     }
-
     if (figurePick === "curvedLine") {
       if (newCurvedLine.length === 1) {
         const spoints = newCurvedLine[0].points;
@@ -221,8 +216,7 @@ function DrawingSpace() {
     }
     if (figurePick === "circle") {
       if (newCircle.length === 1) {
-        // 그리고 있는 사각형이 있다면
-        const sx = newCircle[0].x; // 초기 시작했떤 값을 가져옴
+        const sx = newCircle[0].x;
         const sy = newCircle[0].y;
         const { x, y } = event.target.getStage().getPointerPosition();
         setNewCircle([
@@ -239,8 +233,7 @@ function DrawingSpace() {
     }
     if (figurePick === "square") {
       if (newSquares.length === 1) {
-        // 그리고 있는 사각형이 있다면
-        const sx = newSquares[0].x; // 초기 시작했떤 값을 가져옴
+        const sx = newSquares[0].x;
         const sy = newSquares[0].y;
         const { x, y } = event.target.getStage().getPointerPosition();
         setNewSquares([
